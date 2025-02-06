@@ -86,7 +86,7 @@ hitID = [[], [], []]; hitPE = [[], [], []]; hitT = [[], [], []]
 # ----------------------------------------------------- #
 # ----------------------------------------------------- #
 
-directory = '/Users/doran/Desktop/Research/ANNIE/MC_Data_Comparison/WCSim_changes_to_QE_updated/2023_thru_going/'#'2023_thru_going/'     # change if needed, build file names based on whats present in that directory
+directory = 'data/'     # change if needed, build file names based on whats present in that directory
 file_names = [file for file in os.listdir(directory) if os.path.isfile(os.path.join(directory, file))]
 
 print('There are: ', len(file_names), ' files\n')
