@@ -11,6 +11,9 @@ mpl.rc('font', **font)
 mpl.rcParams['mathtext.fontset'] = 'cm' # Set the math font to Computer Modern
 mpl.rcParams['legend.fontsize'] = 1
 
+TEST_RUN = True    # True = test the script by running over a much smaller sample of the data (to make sure there are no bugs)
+                   # False = run over everything
+
 # ----------------------------------------------------- #
 
 ''' Selection criteria for Michels
@@ -96,10 +99,18 @@ plt.show()
 
 print('Proceeding with script...')
 
+if TEST_RUN == True:
+    print('\n\n####### TEST RUN ENABLED - ONLY RUNNING SCRIPT OVER SMALL DATASET #######')
+    print('#################### WARNING: PLOTS MAY LOOK JANKY! #####################\n')
+
 # Load the data
 counter = 0
 for file_name in file_names:
     with uproot.open(directory + file_name) as file:
+
+        if TEST_RUN == True:
+            if counter > 50:
+                break
         
         print('\nRun: ', file_name, '(', (counter), '/', len(file_names), ')')
         print('------------------------------------------------------------')
@@ -296,7 +307,7 @@ print('\n', count, 'MC michel events\n')
 # Now here is where we trim our sample and do any potential tuning
 
 # effective QE ratio        # alter this and re-run to investigate agreement with different QE ratios
-corrective_factor = 1.1     # effective QE factor applied to all MC hits (saves time as to not having to reproduce samples with different QE ratios)
+corrective_factor = 1.075   # effective QE factor applied to all MC hits (saves time as to not having to reproduce samples with different QE ratios)
 
 charge_mc = []; c1 = []; 
 
