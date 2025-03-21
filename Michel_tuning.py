@@ -5,7 +5,6 @@ import numpy as np
 from tqdm import trange
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from scipy.stats import chi2_contingency
 font = {'family' : 'serif', 'size' : 10 }
 mpl.rc('font', **font)
 mpl.rcParams['mathtext.fontset'] = 'cm' # Set the math font to Computer Modern
@@ -366,21 +365,21 @@ count_factor = len(mc_)/len(data_)
 counts_data, bins_data = np.histogram(data_, bins = binning)
 counts_mc, bins_mc = np.histogram(mc_, bins = binning)
 
-counts_data = [int(counts_data[i]*count_factor) for i in range(len(counts_data))]
+counts_mc = np.array(counts_mc) / count_factor   # scale the counts in MC to make an apt comparison with data
 
 fill_bins = []   # data and mc (it will be the same bins)
 skip = [-1]
 for i in range(len(counts_data)):
     if i not in skip:
-        if counts_data[i] >= 5 and counts_mc[i] >= 5:
+        if counts_data[i] >= 10 and counts_mc[i] >= 10:
             fill_bins.append(bins_data[i])
         else:
             # note the end of the previous bin
             fill_bins.append(bins_data[i])
             sum_d = counts_data[i]; sum_mc = counts_mc[i]
             for j in range((i+1), len(counts_data)):
-                if (sum_d + counts_data[j]) >= 5 and (sum_mc + counts_mc[j]) >= 5:    # combine bins to ensure we have at least 5 counts for a chisq comparison
-                    skip.append(j)
+                if (sum_d + counts_data[j]) >= 10 and (sum_mc + counts_mc[j]) >= 10:    # combine bins to ensure we have at least 5 counts for a chisq comparison
+                    skip.append(j)                                                      # though 5 is the minimum bin occupancy needed, we can require 10 for a more valid chi sq fit
                     break
                 else:
                     sum_d += counts_data[j]
@@ -392,7 +391,7 @@ bin_edges = fill_bins[:-1]
 counts_data, bins_data = np.histogram(data_, bins = fill_bins)
 counts_mc, bins_mc = np.histogram(mc_, bins = fill_bins)
 
-counts_data = [int(counts_data[i]*count_factor) for i in range(len(counts_data))]
+counts_mc = np.array(counts_mc) / count_factor
 
 # fill x-error array as the bin sizes have changed
 xwidth = []
@@ -400,8 +399,8 @@ for i in range(len(fill_bins)-1):
     xwidth.append(int((fill_bins[i+1]-fill_bins[i])/2))
 
 # simple errors (sqrt of bin count)
-mc_errors = [np.sqrt(counts_mc[i]) for i in range(len(counts_mc))]   # errors for mc
-data_errors = [np.sqrt(counts_data[i])*count_factor for i in range(len(counts_data))]
+mc_errors = [np.sqrt(counts_mc[i])/count_factor for i in range(len(counts_mc))]   # stat errors for mc
+data_errors = [np.sqrt(counts_data[i]) for i in range(len(counts_data))]          # stat errors for data
 
 binscenters = np.array([0.5 * (bins_data[i] + bins_data[i + 1]) for i in range (len(bins_data)-1)])
 
@@ -416,13 +415,16 @@ for i in range(len(counts_data)):
         x_info.append(binscenters[i])
     else:
         mc_data.append(counts_mc[i]/counts_data[i])
-        lower_error_bars.append((counts_mc[i]/counts_data[i])*(data_errors[i]/counts_data[i] + \
-                                                              mc_errors[i]/counts_mc[i]) )
+        # handle proper propagation of statistical errors for MC / Data
+        lower_error_bars.append((counts_mc[i]/counts_data[i]) * 
+                                np.sqrt((data_errors[i]/counts_data[i])**2 + \
+                                                              (mc_errors[i]/counts_mc[i])**2 ))
         x_info.append(binscenters[i])
         
-
-obs = np.array([counts_mc, counts_data])
-chi2, p, dof, ex = chi2_contingency(obs)
+# manually calculate a weighted chi sq metric, as we have MC stat errors 
+chi2 = np.sum(((np.array(counts_data) - np.array(counts_mc)) ** 2) / 
+              (np.array(data_errors) ** 2 + np.array(mc_errors) ** 2))
+dof = np.count_nonzero(counts_data) - 1
 print('\nchisq =',chi2/dof,'\n')
 
 
