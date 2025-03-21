@@ -414,21 +414,21 @@ for which in plot_type:
     counts_data, bins_data = np.histogram(data_, bins = binning)
     counts_mc, bins_mc = np.histogram(mc_, bins = binning)
 
-    counts_data = [int(counts_data[i]*count_factor) for i in range(len(counts_data))]
+    counts_mc = np.array(counts_mc) / count_factor
 
     fill_bins = []   # data and mc (it will be the same bins)
     skip = [-1]
     for i in range(len(counts_data)):
         if i not in skip:
-            if counts_data[i] >= 5 and counts_mc[i] >= 5:
+            if counts_data[i] >= 10 and counts_mc[i] >= 10:
                 fill_bins.append(bins_data[i])
             else:
                 # note the end of the previous bin
                 fill_bins.append(bins_data[i])
                 sum_d = counts_data[i]; sum_mc = counts_mc[i]
                 for j in range((i+1), len(counts_data)):
-                    if (sum_d + counts_data[j]) >= 5 and (sum_mc + counts_mc[j]) >= 5:    # combine bins, make sure counts >= 5 for chisq fit
-                        skip.append(j)
+                    if (sum_d + counts_data[j]) >= 10 and (sum_mc + counts_mc[j]) >= 10:    # combine bins, make sure counts >= 5 for chisq fit
+                        skip.append(j)                                                      # require 10 for a more valid comparison
                         break
                     else:
                         sum_d += counts_data[j]
@@ -440,7 +440,7 @@ for which in plot_type:
     counts_data, bins_data = np.histogram(data_, bins = fill_bins)
     counts_mc, bins_mc = np.histogram(mc_, bins = fill_bins)
 
-    counts_data = [int(counts_data[i]*count_factor) for i in range(len(counts_data))]
+    counts_mc = np.array(counts_mc) / count_factor
 
     # fill x-error array as the bin sizes have changed
     xwidth = []
@@ -453,8 +453,8 @@ for which in plot_type:
     
 
     # simple errors (sqrt of bin count)
-    mc_errors = [np.sqrt(counts_mc[i]) for i in range(len(counts_mc))]   # errors for mc
-    data_errors = [np.sqrt(counts_data[i])*count_factor for i in range(len(counts_data))]
+    mc_errors = [np.sqrt(counts_mc[i])/count_factor for i in range(len(counts_mc))]   # errors for mc
+    data_errors = [np.sqrt(counts_data[i]) for i in range(len(counts_data))]
 
     binscenters = np.array([0.5 * (bins_data[i] + bins_data[i + 1]) for i in range (len(bins_data)-1)])
 
@@ -474,8 +474,9 @@ for which in plot_type:
             x_info.append(binscenters[i])
 
 
-    obs = np.array([counts_mc, counts_data])
-    chi2, p, dof, ex = chi2_contingency(obs)
+    chi2 = np.sum(((np.array(counts_data) - np.array(counts_mc)) ** 2) / 
+              (np.array(data_errors) ** 2 + np.array(mc_errors) ** 2))
+    dof = np.count_nonzero(counts_data) - 1    # omit nonzero bins in case we re-binned above
     print('\nchisq =',chi2/dof,'\n')
 
 
