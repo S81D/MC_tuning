@@ -16,20 +16,10 @@ MC data were produced by running the `BeamClusterAnalysisMC` [toolchain](https:/
 - AmBe BeamCluster ntuples: `/exp/annie/data/users/doran/WCSim_AmBe_samples/BC_files/pmt_tilting_v1/QE_1.50_WB_ETEL_LUX_1.0_HM_WM_1.25_corrected_waveforms/`
 - Michel WCSim files: `/pnfs/annie/persistent/users/doran/WCSim_dirt_samples/PMT_tilt/QE_1.50_HM_1.25/` and `/pnfs/annie/persistent/users/doran/WCSim_dirt_samples/PMT_tilt/QE_1.50_HM_1.25_2/` (more stats)
 - Michel BeamCluster ntuples: `/exp/annie/data/users/doran/WCSim_dirt_muons/corrected_waveform/QE_1.50_HM_1.25/` and `/exp/annie/data/users/doran/WCSim_dirt_muons/corrected_waveform/QE_1.50_HM_1.25_2/`
-- Throughgoin WCSim files: `/pnfs/annie/persistent/users/doran/WCSim_thru_samples/PMT_tilt/QE_1.5_HM_1.25/`
+- Throughgoing WCSim files: `/pnfs/annie/persistent/users/doran/WCSim_thru_samples/PMT_tilt/QE_1.5_HM_1.25/`
 - Throughgoing BeamCluster ntuples: `/exp/annie/data/users/doran/WCSim_thru_muons/corrected_waveform/QE_1.50_HM_1.25/`
 
-The Michel WCSim files ntuples can be found on the gpvms here: `/pnfs/annie/persistent/users/doran/WCSim_tuning_BC_root_files/`
-
-WCSim samples used in this analysis can be found on the gpvms in the following locations:
-- Michels: `/pnfs/annie/persistent/simulations/wcsim/wcsim_QE_retuning_michel/`
-- Throughgoing Muons: `/pnfs/annie/persistent/simulations/wcsim/wcsim_QE_retuning_thru_going/`
 
 ### Usage
-`python3 Michel_tuning.py`
 
-`python3 ThruGoingMuons_tuning.py`
-
-Each script loads many events and performs selection cuts, so the scripts take long to compile (~20 minutes each). These scripts were ported from a jupyter notebook; while the scripts run as intended and produce comparison plots between MC and Data, if you plan on doing active tuning / assesing the agreement between data and MC in a more rigorous way, it is recommended to load the data first (perhaps in a notebook), then play around with the charge tuning factor and plot production (to save time).
-
-There is a variable set at the beginning of each script `TEST_RUN` - setting this to 'True' only runs the script over a small subset of the data and each script compiles in under 5 minutes (in case you want to test the scripts initially or are debugging). The scripts may look janky though :) 
+Run each jupyter cell, making sure to adjust paths accordingly. The script will first load in both the data and MC for each dataset (depending on the script), before performing a chi squared comparison and producing plots. Depending on the dataset, the script may take long to compile (~10 minutes max for a given cell).
