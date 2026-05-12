@@ -27,5 +27,9 @@ MC data were produced by running the `BeamClusterAnalysisMC` [toolchain](https:/
 ### Usage
 `AmBe_tuning.ipynb` - the tuning script I used to compare the AmBe simulated samples to the calibration data. This particular implementation (and the files outlined above) should be interpreted as the tuned version of the simulation, and thus the cluster parameters agree closely. The machinery can be adjusted if re-tuning from scratch.
 
+`tuning_MC_Data_agreement.ipynb` - consolidated tuning script for all three datasets that shows the MC / Data agreement for AmBe, Michel, and throughgoing muons. This is a condensed version of multiple scripts I used in the tuning analysis, filtered by Claude AI. I have verified everything seems to be working the same as the original machinery. Please refer to the `AmBe_tuning.ipynb` script as the authoritative MC/Data comparison tuning script. 
+
+These scripts can be modified to adjust the charge per hit and thus the total charge to re-tune the simulation. Right now they exist purely to compare the tuned response and create plots.
+
 
 Run each jupyter cell, making sure to adjust paths accordingly. The script will first load in both the data and MC for each dataset (depending on the script), before performing a chi squared comparison and producing plots. Depending on the dataset, the script may take long to compile (~10 minutes max for a given cell).
