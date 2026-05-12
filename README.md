@@ -3,6 +3,10 @@ Tuning scripts used to align the charge response of WCSim simulated data to real
 
 The following scripts and the data presented are the final, tuned (NC tuning) samples used for the NCQE cross section analysis.
 
+In practice what is done is to take an un-tuned version of the simulation (say for relative collection efficiency i.e. $r_{CE} = 1.0$), and compare the charge, hit, or charge per hit distributions. As a proxy for $r_{CE}$, the total charge, charge per hit, or total hits can be multiplied by a scalar ($R$) to better align the MC with data and achieve the lowest $\chi^2$ value. The simulation samples are then reprocessed with an adjustment to the relative collection efficiency of $R \times r_{CE}$, and re-compared. Since the scalar $R$ does not map cleany onto a true adjustment of the relative collection efficiency, this process is iteratively completed multiple times until the simulated cluster parameters are tuned against a particular dataset. Rather than re-simulating many events with small increments to the implemented collection efficiency (which takes time and a large amount of computational resources), the scalar factor applied directly to the cluster parameters provides a faster approximation that can then be fine-tuned.
+
+Following the tuning of the simulation, an independent dataset can be compared to validate the response.
+
 ### Datasets
 
 Beam data was extracted by converting ProcessedData files into ntuples using the `BeamClusterAnalysis` [toolchain](https://github.com/ANNIEsoft/ToolAnalysis/tree/Application/configfiles/BeamClusterAnalysis). As these filesizes are rather large, another [script](https://github.com/S81D/BeamCluster_extract) was used to filter the information into smaller file sizes for each run. Data files used in this analysis can be found on the gpvms here:
@@ -21,5 +25,7 @@ MC data were produced by running the `BeamClusterAnalysisMC` [toolchain](https:/
 
 
 ### Usage
+`AmBe_tuning.ipynb` - the tuning script I used to compare the AmBe simulated samples to the calibration data. This particular implementation (and the files outlined above) should be interpreted as the tuned version of the simulation, and thus the cluster parameters agree closely. The machinery can be adjusted if re-tuning from scratch.
+
 
 Run each jupyter cell, making sure to adjust paths accordingly. The script will first load in both the data and MC for each dataset (depending on the script), before performing a chi squared comparison and producing plots. Depending on the dataset, the script may take long to compile (~10 minutes max for a given cell).
